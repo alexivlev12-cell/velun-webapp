@@ -80,7 +80,7 @@
 
         <div class="key-box" id="key-display">Ключ не найден</div>
 
-        <a href="#" id="action-btn" class="btn">Загрузка...</a>
+        <button id="action-btn" class="btn">Загрузка...</button>
         <button id="copy-btn" class="btn btn-secondary">🔗 Скопировать ключ</button>
     </div>
 
@@ -104,20 +104,22 @@
         if (isIOS) {
             instructionText.innerHTML = "1. Установите приложение <b>Incy</b> из App Store.<br>2. Нажмите кнопку ниже для автоматического импорта ключа.";
             actionBtn.innerText = "📲 Открыть в Incy (iOS)";
-            actionBtn.href = `incy://import/${subLink}`;
+            actionBtn.onclick = () => { window.location.href = `incy://import/${subLink}`; };
         } else if (isAndroid) {
             instructionText.innerHTML = "1. Установите <b>Incy</b> из Google Play.<br>2. Нажмите кнопку ниже для автоматического импорта ключа.";
             actionBtn.innerText = "🤖 Открыть в Incy (Android)";
-            actionBtn.href = `incy://import/${subLink}`;
+            actionBtn.onclick = () => { window.location.href = `incy://import/${subLink}`; };
         } else if (isMac) {
-            instructionText.innerHTML = "1. Установите клиент <b>FoXray</b> из Mac App Store.<br>2. Скопируйте ключ и добавьте его в приложение.";
-            actionBtn.innerText = "🍏 Скачать FoXray (App Store)";
-            actionBtn.href = "https://apps.apple.com/app/foxray/id6448898396";
+            instructionText.innerHTML = "1. Установите клиент <b>FoXray</b> из App Store.<br>2. Скопируйте ключ и добавьте его в приложение.";
+            actionBtn.innerText = "🍏 Скачать FoXray";
+            actionBtn.onclick = () => { window.location.href = "https://apps.apple.com/app/foxray/id6448898396"; };
         } else {
-            // ПК (Windows)
-            instructionText.innerHTML = "1. Скачайте официальный архив <b>v2rayN-With-Core.zip</b>.<br>2. Распакуйте и запустите v2rayN.exe.<br>3. Скопируйте ключ и добавьте в приложение.";
-            actionBtn.innerText = "💻 Скачать v2rayN для Windows";
-            actionBtn.href = "https://github.com/2dust/v2rayN/releases/latest/download/v2rayN-With-Core.zip";
+            // ПК (Windows) - запрашиваем архив прямо в чат бота
+            instructionText.innerHTML = "1. Нажмите кнопку ниже, чтобы получить архив <b>v2rayN</b> прямо в чат бота.<br>2. Распакуйте и добавьте ключ.";
+            actionBtn.innerText = "💻 Получить v2rayN в чат бота";
+            actionBtn.onclick = () => {
+                tg.sendData("get_v2rayn");
+            };
         }
 
         document.getElementById('copy-btn').addEventListener('click', () => {
