@@ -1,62 +1,133 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>VelunVPN Подключение</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; text-align: center; }
-    h1 { font-size: 24px; margin-bottom: 8px; font-weight: 800; }
-    p { font-size: 14px; color: #94a3b8; margin-bottom: 30px; }
-    .btn { display: block; width: 100%; max-width: 320px; padding: 16px; margin: 10px 0; border-radius: 14px; font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; transition: 0.2s; }
-    .btn-download { background: #334155; color: #fff; }
-    .btn-connect { background: #38bdf8; color: #0f172a; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VelunVPN — Настройка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #0f172a);
+            --card-bg: var(--tg-theme-secondary-bg-color, #1e293b);
+            --text-color: var(--tg-theme-text-color, #f8fafc);
+            --hint-color: var(--tg-theme-hint-color, #94a3b8);
+            --accent-color: var(--tg-theme-button-color, #3b82f6);
+            --accent-text: var(--tg-theme-button-text-color, #ffffff);
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            box-sizing: border-box;
+            text-align: center;
+        }
+        h2 { margin-top: 0; font-size: 22px; }
+        p { color: var(--hint-color); font-size: 14px; line-height: 1.5; }
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--accent-color);
+            color: var(--accent-text);
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            text-decoration: none;
+            box-sizing: border-box;
+            transition: opacity 0.2s;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+        .key-box {
+            background: rgba(0,0,0,0.2);
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--hint-color);
+            margin: 15px 0;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
-  <h1>🚀 VelunVPN</h1>
-  <p>2 простых шага для выхода на сверхскорости</p>
+    <div class="container">
+        <h2>⚡ Настройка VelunVPN</h2>
+        <p id="instruction-text">Определяем ваше устройство...</p>
 
-  <button id="downloadBtn" class="btn btn-download" onclick="downloadApp()">1. 📲 Скачать приложение</button>
-  <button id="connectBtn" class="btn btn-connect" onclick="setupVPN()">2. ⚡ Настроить в 1 клик</button>
+        <div class="key-box" id="key-display">Ключ не найден</div>
 
-  <script>
-    const tg = window.Telegram.WebApp;
-    tg.expand();
+        <a href="#" id="action-btn" class="btn">Загрузка...</a>
+        <button id="copy-btn" class="btn btn-secondary">🔗 Скопировать ключ</button>
+    </div>
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const subUrl = urlParams.get('sub') || "";
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
 
-    function getOS() {
-      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return 'iOS';
-      if (/android/i.test(userAgent)) return 'Android';
-      return 'PC';
-    }
+        // Достаем параметры из URL
+        const urlParams = new URLSearchParams(window.location.search);
+        let subLink = urlParams.get('sub') || "";
 
-    function downloadApp() {
-      const os = getOS();
-      if (os === 'iOS') {
-        window.open("https://apps.apple.com/app/incy-vless-client/id6470000000", "_blank");
-      } else if (os === 'Android') {
-        window.open("https://play.google.com/store/apps/details?id=com.v2ray.core", "_blank");
-      } else {
-        window.open("https://github.com/MatsuriDayo/nekoray/releases", "_blank");
-      }
-    }
+        document.getElementById('key-display').innerText = subLink ? subLink : "Ключ отсутствует или не активен";
 
-    function setupVPN() {
-      if (!subUrl) {
-        alert("Ссылка на подписку не найдена!");
-        return;
-      }
-      // Открытие прямой связки в INCY / Streisand
-      window.location.href = `streisand://import/${subUrl}`;
-      setTimeout(() => {
-        window.location.href = subUrl;
-      }, 500);
-    }
-  </script>
+        // Определяем устройство
+        const ua = navigator.userAgent || navigator.vendor || window.opera;
+        const isIOS = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+        const isAndroid = /android/i.test(ua);
+        const isMac = /Macintosh|MacIntel|MacPPC|Mac68K/.test(ua);
+
+        const actionBtn = document.getElementById('action-btn');
+        const instructionText = document.getElementById('instruction-text');
+
+        if (isIOS) {
+            instructionText.innerHTML = "1. Установите приложение <b>Incy</b> из App Store.<br>2. Нажмите кнопку ниже для автоматического импорта ключа.";
+            actionBtn.innerText = "📲 Открыть в Incy (iOS)";
+            actionBtn.href = `incy://import/${subLink}`;
+        } else if (isAndroid) {
+            instructionText.innerHTML = "1. Установите <b>Incy</b> из Google Play.<br>2. Нажмите кнопку ниже для настройки в 1 клик.";
+            actionBtn.innerText = "🤖 Открыть в Incy (Android)";
+            actionBtn.href = `v2rayng://install-config?url=${encodeURIComponent(subLink)}`;
+        } else if (isMac) {
+            instructionText.innerHTML = "1. Установите клиент <b>FoXray</b> из Mac App Store.<br>2. Скопируйте ключ и добавьте его в приложение.";
+            actionBtn.innerText = "🍏 Открыть App Store (FoXray)";
+            actionBtn.href = "https://apps.apple.com/app/foxray/id6448898396";
+        } else {
+            // ПК (Windows) - качаем последнюю официальную сборку с GitHub Releases без ограничений по весу
+            instructionText.innerHTML = "1. Скачайте официальный архив <b>v2rayN-With-Core.zip</b>.<br>2. Распакуйте и запустите v2rayN.exe.<br>3. Скопируйте ключ и добавьте в приложение.";
+            actionBtn.innerText = "💻 Скачать v2rayN для Windows";
+            actionBtn.href = "https://github.com/2dust/v2rayN/releases/latest/download/v2rayN-With-Core.zip";
+        }
+
+        // Кнопка копирования
+        document.getElementById('copy-btn').addEventListener('click', () => {
+            navigator.clipboard.writeText(subLink).then(() => {
+                tg.showAlert("Ключ успешно скопирован в буфер обмена! ✨");
+            });
+        });
+    </script>
 </body>
 </html>
