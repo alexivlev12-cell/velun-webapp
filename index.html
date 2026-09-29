@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>VelunVPN Подключение</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #0f172a; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; text-align: center; }
+    h1 { font-size: 24px; margin-bottom: 8px; font-weight: 800; }
+    p { font-size: 14px; color: #94a3b8; margin-bottom: 30px; }
+    .btn { display: block; width: 100%; max-width: 320px; padding: 16px; margin: 10px 0; border-radius: 14px; font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; transition: 0.2s; }
+    .btn-download { background: #334155; color: #fff; }
+    .btn-connect { background: #38bdf8; color: #0f172a; }
+  </style>
+</head>
+<body>
+  <h1>🚀 VelunVPN</h1>
+  <p>2 простых шага для выхода на сверхскорости</p>
+
+  <button id="downloadBtn" class="btn btn-download" onclick="downloadApp()">1. 📲 Скачать приложение</button>
+  <button id="connectBtn" class="btn btn-connect" onclick="setupVPN()">2. ⚡ Настроить в 1 клик</button>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const subUrl = urlParams.get('sub') || "";
+
+    function getOS() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return 'iOS';
+      if (/android/i.test(userAgent)) return 'Android';
+      return 'PC';
+    }
+
+    function downloadApp() {
+      const os = getOS();
+      if (os === 'iOS') {
+        window.open("https://apps.apple.com/app/incy-vless-client/id6470000000", "_blank");
+      } else if (os === 'Android') {
+        window.open("https://play.google.com/store/apps/details?id=com.v2ray.core", "_blank");
+      } else {
+        window.open("https://github.com/MatsuriDayo/nekoray/releases", "_blank");
+      }
+    }
+
+    function setupVPN() {
+      if (!subUrl) {
+        alert("Ссылка на подписку не найдена!");
+        return;
+      }
+      // Открытие прямой связки в INCY / Streisand
+      window.location.href = `streisand://import/${subUrl}`;
+      setTimeout(() => {
+        window.location.href = subUrl;
+      }, 500);
+    }
+  </script>
+</body>
+</html>
