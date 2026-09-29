@@ -37,7 +37,7 @@
             text-align: center;
         }
         h2 { margin-top: 0; font-size: 22px; }
-        p { color: var(--hint-color); font-size: 14px; line-height: 1.5; }
+        p { color: var(--hint-color); font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
         .btn {
             display: block;
             width: 100%;
@@ -49,7 +49,7 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 16px;
+            margin-top: 12px;
             text-decoration: none;
             box-sizing: border-box;
             transition: opacity 0.2s;
@@ -60,16 +60,25 @@
             color: var(--accent-color);
             border: 2px solid var(--accent-color);
         }
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin: 20px 0 8px 0;
+            text-align: left;
+            color: var(--text-color);
+        }
         .key-box {
             background: rgba(0,0,0,0.2);
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             word-break: break-all;
             font-family: monospace;
-            font-size: 12px;
+            font-size: 11px;
             color: var(--hint-color);
-            margin: 15px 0;
+            margin: 10px 0;
             text-align: left;
+            max-height: 60px;
+            overflow-y: auto;
         }
     </style>
 </head>
@@ -78,10 +87,12 @@
         <h2>⚡ Настройка VelunVPN</h2>
         <p id="instruction-text">Определяем ваше устройство...</p>
 
-        <div class="key-box" id="key-display">Ключ не найден</div>
+        <!-- Динамический блок для кнопок -->
+        <div id="content-area"></div>
 
-        <button id="action-btn" class="btn">Загрузка...</button>
-        <button id="copy-btn" class="btn btn-secondary">🔗 Скопировать ключ</button>
+        <div class="section-title">Ваш ключ подписки:</div>
+        <div class="key-box" id="key-display">Загрузка...</div>
+        <button id="copy-btn" class="btn btn-secondary" style="margin-top: 8px; padding: 10px; font-size: 14px;">🔗 Скопировать ключ вручную</button>
     </div>
 
     <script>
@@ -98,28 +109,35 @@
         const isAndroid = /android/i.test(ua);
         const isMac = /Macintosh|MacIntel|MacPPC|Mac68K/.test(ua);
 
-        const actionBtn = document.getElementById('action-btn');
         const instructionText = document.getElementById('instruction-text');
+        const contentArea = document.getElementById('content-area');
 
         if (isIOS) {
-            instructionText.innerHTML = "1. Установите приложение <b>Incy</b> из App Store.<br>2. Нажмите кнопку ниже для автоматического импорта ключа.";
-            actionBtn.innerText = "📲 Открыть в Incy (iOS)";
-            actionBtn.onclick = () => { window.location.href = `incy://import/${subLink}`; };
+            instructionText.innerHTML = "Шаг 1: Установите приложение <b>Incy</b>.<br>Шаг 2: Нажмите кнопку импорта ключа.";
+            contentArea.innerHTML = `
+                <a href="https://apps.apple.com/us/app/incy/id6756943388?l=ru" class="btn btn-secondary" target="_blank">📥 Скачать Incy из App Store</a>
+                <a href="incy://import/${subLink}" class="btn">🚀 Импортировать ключ в Incy</a>
+            `;
         } else if (isAndroid) {
-            instructionText.innerHTML = "1. Установите <b>Incy</b> из Google Play.<br>2. Нажмите кнопку ниже для автоматического импорта ключа.";
-            actionBtn.innerText = "🤖 Открыть в Incy (Android)";
-            actionBtn.onclick = () => { window.location.href = `incy://import/${subLink}`; };
+            instructionText.innerHTML = "Шаг 1: Установите приложение <b>Incy</b>.<br>Шаг 2: Нажмите кнопку импорта ключа.";
+            contentArea.innerHTML = `
+                <a href="https://play.google.com/store/apps/details?id=llc.itdev.incy" class="btn btn-secondary" target="_blank">📥 Скачать Incy из Google Play</a>
+                <a href="incy://import/${subLink}" class="btn">🤖 Импортировать ключ в Incy</a>
+            `;
         } else if (isMac) {
-            instructionText.innerHTML = "1. Установите клиент <b>FoXray</b> из App Store.<br>2. Скопируйте ключ и добавьте его в приложение.";
-            actionBtn.innerText = "🍏 Скачать FoXray";
-            actionBtn.onclick = () => { window.location.href = "https://apps.apple.com/app/foxray/id6448898396"; };
+            instructionText.innerHTML = "Настройка для macOS:";
+            contentArea.innerHTML = `
+                <a href="https://apps.apple.com/app/foxray/id6448898396" class="btn btn-secondary" target="_blank">🍏 Скачать FoXray (App Store)</a>
+            `;
         } else {
-            // ПК (Windows) - запрашиваем архив прямо в чат бота
-            instructionText.innerHTML = "1. Нажмите кнопку ниже, чтобы получить архив <b>v2rayN</b> прямо в чат бота.<br>2. Распакуйте и добавьте ключ.";
-            actionBtn.innerText = "💻 Получить v2rayN в чат бота";
-            actionBtn.onclick = () => {
+            // ПК (Windows)
+            instructionText.innerHTML = "Шаг 1: Скачайте архив v2rayN прямо в чат бота.<br>Шаг 2: Скопируйте и добавьте ключ.";
+            contentArea.innerHTML = `
+                <button id="pc-download-btn" class="btn btn-secondary">💻 Скачать v2rayN (архив в ТГ)</button>
+            `;
+            document.getElementById('pc-download-btn').addEventListener('click', () => {
                 tg.sendData("get_v2rayn");
-            };
+            });
         }
 
         document.getElementById('copy-btn').addEventListener('click', () => {
